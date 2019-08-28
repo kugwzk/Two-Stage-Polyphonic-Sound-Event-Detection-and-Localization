@@ -39,7 +39,7 @@ class LogMelExtractor():
 
         channel_num = audio.shape[0]
         feature_logmel = []
-        print(audio.shape)
+        # print(audio.shape)
         for n in range(channel_num):
             S = np.abs(librosa.stft(y=audio[n],
                                     n_fft=self.nfft,
@@ -202,7 +202,7 @@ def extract_features(args):
 
             audio_path = os.path.join(audio_dir, audio_fn)
 
-            audio, _ = librosa.load(audio_path, sr=fs, mono=False, dtype=np.float32)
+            audio, _ = librosa.load(audio_path, sr=fs, mono=True, dtype=np.float32)
             '''(channel_nums, samples)'''
             audio_count += 1
 
