@@ -347,7 +347,7 @@ def read_dataset(feature_dir: str, metadata_path: str) -> List[Dict[str, Any]]:
         e['event_labels_str'] = e['event_labels'].split(',')
         e['event_labels_one_hot'] = np.array(
             [int(id_to_label_map[i] in e['event_labels_str']) for i in range(len(id_to_label_map))], dtype=float)
-        with h5py.File(e['filename'], 'r') as h5f:
+        with h5py.File(os.path.join(feature_dir, e['filename']), 'r') as h5f:
             e['feature'] = h5f['feature'].value
     return data_list
 
