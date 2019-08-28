@@ -15,10 +15,10 @@ from tqdm import tqdm
 
 from utilities import calculate_scalar, event_labels, lb_to_ix
 
-fs = 32000
-nfft = 1024
-hopsize = 320 # 640 for 20 ms
-mel_bins = 96
+fs = 44100
+nfft = 2048
+hopsize = 640 # 640 for 20 ms
+mel_bins = 128
 window = 'hann'
 fmin = 50
 hdf5_folder_name = '{}fs_{}nfft_{}hs_{}melb'.format(fs, nfft, hopsize, mel_bins)
@@ -200,7 +200,7 @@ def extract_features(args):
             audio, _ = librosa.load(audio_path, sr=fs, mono=False, dtype=np.float32)
             '''(channel_nums, samples)'''
             audio_count += 1
-
+            '''
             if np.sum(np.abs(audio)) < len(audio)*1e-4:
                 with open("feature_removed.txt", "a+") as text_file:
                     # print("Purchase Amount: {}".format(TotalAmount), file=text_file)
@@ -208,7 +208,7 @@ def extract_features(args):
                         file=text_file)
                     tqdm.write("Silent file removed in feature extractor: {}".format(audio_fn))
                 continue
-
+            '''
             # features
             feature = RT_preprocessing(audio, args.feature_type)
             '''(channels, time, frequency)'''               
@@ -304,9 +304,8 @@ if __name__ == '__main__':
     parser.add_argument('--feature_type', type=str, required=True,
                                 choices=['logmel', 'logmelgcc'])   
     parser.add_argument('--data_type', type=str, required=True, 
-                                choices=['dev', 'eval'])
-    parser.add_argument('--audio_type', type=str, required=True,
-                                choices=['foa', 'mic'])
+                                choices=['train', 'dev', 'eval'])
+
                              
 
     args = parser.parse_args()

@@ -28,10 +28,10 @@ from utils.utilities import (create_logging, doa_labels, event_labels,
 
 ## Hyper-parameters
 ################# Model #################
-Model_SED = 'CRNN10'            # 'CRNN10' | 'VGG9'
-Model_DOA = 'pretrained_CRNN10' # 'pretrained_CRNN10' | 'pretrained_VGG9'
-model_pool_type = 'avg'         # 'max' | 'avg'
-model_pool_size = (2,2)
+Model_SED = 'CRNN3'            # 'CRNN10' | 'VGG9'
+# Model_DOA = 'pretrained_CRNN10' # 'pretrained_CRNN10' | 'pretrained_VGG9'
+model_pool_type = 'max'         # 'max' | 'avg'
+model_pool_size = (1,4)
 model_interp_ratio = 16
 
 loss_type = 'MAE'
@@ -42,10 +42,10 @@ lr = 1e-3
 weight_decay = 0
 threshold = {'sed': 0.3}
 
-fs = 32000
-nfft = 1024
-hopsize = 320 # 640 for 20 ms
-mel_bins = 96
+fs = 44100
+nfft = 2048
+hopsize = 640 # 640 for 20 ms
+mel_bins = 128
 frames_per_1s = fs // hopsize
 sub_frames_per_1s = 50
 chunklen = int(2 * frames_per_1s)
