@@ -26,6 +26,7 @@ class CRNN3(nn.Module):
             num_layers=1, batch_first=True, bidirectional=True)
 
         self.event_fc = nn.Linear(512, class_num, bias=True)
+
         # self.azimuth_fc = nn.Linear(512, class_num, bias=True)
         # self.elevation_fc = nn.Linear(512, class_num, bias=True)
 
@@ -57,20 +58,22 @@ class CRNN3(nn.Module):
         ''' (batch_size, time_steps, feature_maps):'''
 
         (x, _) = self.gru(x)
-        
-        event_output = torch.sigmoid(self.event_fc(x))
+
+        x = self.event_fc(x)
+        sigmoid_output = torch.sigmoid(x)
+        softmax_output = torch.softmax(x)
+        loss_output = torch.sum(sigmoid_output * softmax_output, dim=1) / torch.sum(softmax_output, dim=1)
+
         # azimuth_output = self.azimuth_fc(x)
         # elevation_output = self.elevation_fc(x)
+        #loss_output
+        '''(batch_size, class_num)'''
+        #sigmoid_output
         '''(batch_size, time_steps, class_num)'''
 
-        # Interpolate
-        event_output = interpolate(event_output, self.interp_ratio)
-        # azimuth_output = interpolate(azimuth_output, self.interp_ratio)
-        # elevation_output = interpolate(elevation_output, self.interp_ratio)
-        
         output = {
-            'events': event_output,
-            # 'doas': torch.cat((azimuth_output, elevation_output), dim=-1)
+            'loss_output': loss_output,
+            'inference_output': sigmoid_output
         }
 
         return output
