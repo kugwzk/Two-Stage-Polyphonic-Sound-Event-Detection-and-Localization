@@ -81,7 +81,7 @@ class CRNN3(nn.Module):
 
 class pretrained_CRNN10(CRNN3):
 
-    def __init__(self, class_num, pool_type='avg', pool_size=(2,2), interp_ratio=16, pretrained_path=None):
+    def __init__(self, class_num, pool_type='avg', pool_size=(1,4), interp_ratio=16, pretrained_path=None):
 
         super().__init__(class_num, pool_type, pool_size, interp_ratio, pretrained_path)
         

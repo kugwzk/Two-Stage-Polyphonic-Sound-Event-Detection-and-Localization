@@ -469,8 +469,7 @@ if __name__ == '__main__':
         models_dir = os.path.join(appendixes_dir, 'models_saved')
 
     logging.info('\n===> Building model')
-    model = models.__dict__[args.model](class_num, args.model_pool_type,
-                                        args.model_pool_size)
+    model = models.__dict__[args.model](class_num, args.model_pool_type)
     optimizer = optim.Adam(model.parameters(), lr=lr,
                            betas=(0.9, 0.999), eps=1e-08,
                            weight_decay=weight_decay, amsgrad=True)
