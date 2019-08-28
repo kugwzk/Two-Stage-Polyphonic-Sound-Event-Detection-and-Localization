@@ -40,18 +40,17 @@ class LogMelExtractor():
         channel_num = audio.shape[0]
         feature_logmel = []
         # print(audio.shape)
-        for n in range(channel_num):
-            S = np.abs(librosa.stft(y=audio[0],
-                                    n_fft=self.nfft,
-                                    hop_length=self.hopsize,
-                                    center=True,
-                                    window=self.window,
-                                    pad_mode='reflect'))**2
+        S = np.abs(librosa.stft(y=audio,
+                                n_fft=self.nfft,
+                                hop_length=self.hopsize,
+                                center=True,
+                                window=self.window,
+                                pad_mode='reflect'))**2
 
-            S_mel = np.dot(self.melW, S).T
-            S_logmel = librosa.power_to_db(S_mel, ref=1.0, amin=1e-10, top_db=None)
-            S_logmel = np.expand_dims(S_logmel, axis=0)
-            feature_logmel.append(S_logmel)
+        S_mel = np.dot(self.melW, S).T
+        S_logmel = librosa.power_to_db(S_mel, ref=1.0, amin=1e-10, top_db=None)
+        S_logmel = np.expand_dims(S_logmel, axis=0)
+        feature_logmel.append(S_logmel)
 
         feature_logmel = np.concatenate(feature_logmel, axis=0)
 
