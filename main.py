@@ -344,7 +344,7 @@ def read_dataset(feature_dir: str, metadata_path: str) -> List[Dict[str, Any]]:
     csv_df = pandas.read_csv(metadata_path, sep='\t')
     data_list = [e[1].to_dict() for e in csv_df.iterrows()]
     for e in data_list:
-        e['event_labels_str'] = e['event_labels'].split(',')
+        e['event_labels_str'] = e['event_label'].split(',')
         e['event_labels_one_hot'] = np.array(
             [int(id_to_label_map[i] in e['event_labels_str']) for i in range(len(id_to_label_map))], dtype=float)
         try:
@@ -509,7 +509,7 @@ if __name__ == '__main__':
 
     validation_data = read_dataset(features_path+"/validation", "metadata/test/test.csv")
 
-    eval_data = read_dataset(features_path+"/eval", "metadata/eval/eval.csv")
+    eval_data = read_dataset(features_path+"/eval", "metadata/eval/eval_labeled.csv")
     print()
     '''
     4. Train, test and evaluation
