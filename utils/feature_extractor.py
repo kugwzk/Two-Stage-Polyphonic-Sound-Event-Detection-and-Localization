@@ -299,9 +299,9 @@ def fit(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Extract features from audio file')
 
-    parser.add_argument('--dataset_dir', type=str, required=True, default="../../TASK4")
+    parser.add_argument('--dataset_dir', type=str, default="../../TASK4")
     parser.add_argument('--feature_dir', type=str, required=True)
-    parser.add_argument('--feature_type', type=str, required=True, default='logmel',
+    parser.add_argument('--feature_type', type=str, default='logmel',
                                 choices=['logmel', 'logmelgcc'])
     parser.add_argument('--data_type', type=str, required=True, 
                                 choices=['train/weak', 'train/unlabel_in_domain', 'validation', 'eval'])
