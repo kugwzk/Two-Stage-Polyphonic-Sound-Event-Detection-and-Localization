@@ -167,16 +167,22 @@ def extract_features(args):
     """
 
     # Path
-    audio_dir = os.path.join(args.dataset_dir, args.audio_type + '_' + args.data_type)
-    meta_dir = os.path.join(args.dataset_dir, 'metadata_' + args.data_type)
-
-    if args.data_type == 'dev':
+    audio_dir = os.path.join(args.dataset_dir, "audio/" + args.data_type)
+    meta_dir = os.path.join(args.dataset_dir, 'metadata/' + args.data_type)
+    if args.data_type == 'train/weak':
         hdf5_dir = os.path.join(args.feature_dir, args.feature_type,
-                                hdf5_folder_name, args.audio_type + '_dev/')
+                                hdf5_folder_name, 'train/weak/')
+    elif args.data_type == 'train/unlabel_in_domain':
+        hdf5_dir = os.path.join(args.feature_dir, args.feature_type,
+                                hdf5_folder_name, 'train/unlabel_in_domain/')
+
+    elif args.data_type == 'validation':
+        hdf5_dir = os.path.join(args.feature_dir, args.feature_type,
+                                hdf5_folder_name, 'validation/')
 
     elif args.data_type == 'eval':
         hdf5_dir = os.path.join(args.feature_dir, args.feature_type,
-                        hdf5_folder_name, args.audio_type + '_eval/')
+                        hdf5_folder_name, 'eval/')
 
     else:
         raise Exception('Wrong data type input.')
@@ -194,25 +200,16 @@ def extract_features(args):
 
         if audio_fn.endswith('.wav') and not audio_fn.startswith('.'):
 
-            fn = audio_fn.split('.')[0]
             audio_path = os.path.join(audio_dir, audio_fn)
 
             audio, _ = librosa.load(audio_path, sr=fs, mono=False, dtype=np.float32)
             '''(channel_nums, samples)'''
             audio_count += 1
-            '''
-            if np.sum(np.abs(audio)) < len(audio)*1e-4:
-                with open("feature_removed.txt", "a+") as text_file:
-                    # print("Purchase Amount: {}".format(TotalAmount), file=text_file)
-                    print(f"Silent file removed in feature extractor: {audio_fn}", 
-                        file=text_file)
-                    tqdm.write("Silent file removed in feature extractor: {}".format(audio_fn))
-                continue
-            '''
+
             # features
             feature = RT_preprocessing(audio, args.feature_type)
             '''(channels, time, frequency)'''               
-
+            '''
             if args.data_type == 'dev':
 
                 meta_fn = fn + '.csv'
@@ -227,13 +224,12 @@ def extract_features(args):
 
             elif args.data_type == 'eval':
                 raise Exception('Leave for further editing')
-
-            hdf5_path = os.path.join(hdf5_dir, fn + '.h5')
+            '''
+            hdf5_path = os.path.join(hdf5_dir, audio_fn + '.h5')
             with h5py.File(hdf5_path, 'w') as hf:
 
                 hf.create_dataset('feature', data=feature, dtype=np.float32)
-                # hf.create_dataset('filename', data=[na.encode() for na in [fn]], dtype='S20')
-
+                '''
                 if args.data_type == 'dev':
                     
                     hf.create_group('target')
@@ -243,7 +239,7 @@ def extract_features(args):
                     hf['target'].create_dataset('elevation', data=target_ele, dtype=np.float32)
                     hf['target'].create_dataset('azimuth', data=target_azi, dtype=np.float32)
                     hf['target'].create_dataset('distance', data=target_dist, dtype=np.float32)    
-
+                '''
             tqdm.write('{}, {}, {}'.format(audio_count, hdf5_path, feature.shape))
     
     iterator.close()
@@ -259,17 +255,21 @@ def fit(args):
         data_type: 'dev' | 'eval'
         audio_type: 'foa' | 'mic'
     """
-    
-    if args.data_type == 'dev':
+    if args.data_type == 'train/weak':
         hdf5_dir = os.path.join(args.feature_dir, args.feature_type,
-                                hdf5_folder_name, args.audio_type + '_dev/')
-
+                                hdf5_folder_name, 'train/weak/')
+    elif args.data_type == 'train/unlabel_in_domain':
+        hdf5_dir = os.path.join(args.feature_dir, args.feature_type,
+                                hdf5_folder_name, 'train/unlabel_in_domain/')
+    elif args.data_type == 'validation':
+        hdf5_dir = os.path.join(args.feature_dir, args.feature_type,
+                                hdf5_folder_name, 'validation/')
     elif args.data_type == 'eval':
         hdf5_dir = os.path.join(args.feature_dir, args.feature_type,
-                            hdf5_folder_name, args.audio_type + '_eval/')    
+                                hdf5_folder_name, 'eval/')
 
     scalar_path = os.path.join(args.feature_dir, args.feature_type,
-                            hdf5_folder_name, args.audio_type + '_scalar.h5')
+                            hdf5_folder_name, 'scalar.h5')
 
     os.makedirs(os.path.dirname(scalar_path), exist_ok=True)
 
@@ -299,12 +299,12 @@ def fit(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Extract features from audio file')
 
-    parser.add_argument('--dataset_dir', type=str, required=True)
+    parser.add_argument('--dataset_dir', type=str, required=True, default="../../TASK4")
     parser.add_argument('--feature_dir', type=str, required=True)
     parser.add_argument('--feature_type', type=str, required=True,
-                                choices=['logmel', 'logmelgcc'])   
+                                choices=['logmel', 'logmelgcc'])
     parser.add_argument('--data_type', type=str, required=True, 
-                                choices=['train', 'dev', 'eval'])
+                                choices=['train/weak', 'train/unlabel_in_domain', 'validation', 'eval'])
 
                              
 
