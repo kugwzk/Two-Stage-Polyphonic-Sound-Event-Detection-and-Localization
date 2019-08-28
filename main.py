@@ -311,38 +311,36 @@ def inference_all_fold(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='DCASE2019 task3')
+    parser = argparse.ArgumentParser(description='DCASE2018 task4')
 
     subparsers = parser.add_subparsers(dest='mode')
 
     parser_train = subparsers.add_parser('train')
-    parser_train.add_argument('--workspace', type=str, required=True,
-                                help='workspace directory')
+    # parser_train.add_argument('--workspace', type=str, required=True,
+                                # help='workspace directory')
     parser_train.add_argument('--feature_dir', type=str, required=True,
                                 help='feature directory')
-    parser_train.add_argument('--feature_type', type=str, required=True,
+    parser_train.add_argument('--feature_type', type=str, default='logmel',
                                 choices=['logmel', 'logmelgcc'])
-    parser_train.add_argument('--audio_type', type=str, required=True, 
-                              choices=['foa', 'mic'], help='audio type')
-    parser_train.add_argument('--task_type', type=str, required=True,
-                                choices=['sed_only', 'doa_only', 'two_staged_eval', 'seld'])
-    parser_train.add_argument('--fold', default=1, type=int,
+
+    # parser_train.add_argument('--task_type', type=str, required=True,
+                                # choices=['sed_only', 'doa_only', 'two_staged_eval', 'seld'])
+    parser_train.add_argument('--fold', default=-1, type=int,
                                 help='fold for cross validation, if -1, use full data')
     parser_train.add_argument('--seed', default='42', type=int,
                                 help='random seed')  
 
     parser_inference = subparsers.add_parser('inference')
-    parser_inference.add_argument('--workspace', type=str, required=True,
-                                help='workspace directory')
+    # parser_inference.add_argument('--workspace', type=str, required=True,
+    #                            help='workspace directory')
     parser_inference.add_argument('--feature_dir', type=str, required=True,
                                 help='feature directory')
-    parser_inference.add_argument('--feature_type', type=str, required=True,
+    parser_inference.add_argument('--feature_type', type=str, default='logmel',
                                 choices=['logmel', 'logmelgcc'])
-    parser_inference.add_argument('--audio_type', type=str, required=True, 
-                                choices=['foa', 'mic'], help='audio type')
-    parser_inference.add_argument('--task_type', type=str, required=True,
-                                choices=['sed_only', 'doa_only', 'two_staged_eval', 'seld'])
-    parser_inference.add_argument('--fold', default=1, type=int,
+                                #
+    # parser_inference.add_argument('--task_type', type=str, required=True,
+                                # choices=['sed_only', 'doa_only', 'two_staged_eval', 'seld'])
+    parser_inference.add_argument('--fold', default=-1, type=int,
                                 help='fold for cross validation, if -1, use full data')
     parser_inference.add_argument('--iteration', default=5000, type=int,
                                 help='which iteration model to read')                                
@@ -352,10 +350,9 @@ if __name__ == '__main__':
     parser_inference_all = subparsers.add_parser('inference_all')
     parser_inference_all.add_argument('--workspace', type=str, required=True,
                                 help='workspace directory')
-    parser_inference_all.add_argument('--audio_type', type=str, required=True, 
-                                choices=['foa', 'mic'], help='audio type')
-    parser_inference_all.add_argument('--task_type', type=str, required=True,
-                                choices=['sed_only', 'doa_only', 'two_staged_eval', 'seld'])
+
+    # parser_inference_all.add_argument('--task_type', type=str, required=True,
+                                # choices=['sed_only', 'doa_only', 'two_staged_eval', 'seld'])
     parser_inference_all.add_argument('--seed', default='42', type=int,
                                 help='random seed')  
 
@@ -380,7 +377,6 @@ if __name__ == '__main__':
     if args.task_type == 'sed_only' or args.task_type == 'seld':
         args.model = Model_SED
     elif args.task_type == 'doa_only' or args.task_type == 'two_staged_eval':
-        args.model = Model_DOA
     args.model_pool_type = model_pool_type
     args.model_pool_size = model_pool_size
     args.model_interp_ratio = model_interp_ratio

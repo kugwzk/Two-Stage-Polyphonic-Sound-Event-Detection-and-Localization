@@ -8,17 +8,16 @@ import torch.nn.functional as F
 from models.model_utilities import ConvBlock, init_gru, init_layer, interpolate
 
 
-class CRNN10(nn.Module):
-    def __init__(self, class_num, pool_type='avg', pool_size=(2,2), interp_ratio=16, pretrained_path=None):
+class CRNN3(nn.Module):
+    def __init__(self, class_num, pool_type='avg', pool_size=(1,4), pretrained_path=None):
         
         super().__init__()
 
         self.class_num = class_num
         self.pool_type = pool_type
         self.pool_size = pool_size
-        self.interp_ratio = interp_ratio
         
-        self.conv_block1 = ConvBlock(in_channels=10, out_channels=64)
+        self.conv_block1 = ConvBlock(in_channels=1, out_channels=64)
         self.conv_block2 = ConvBlock(in_channels=64, out_channels=128)
         self.conv_block3 = ConvBlock(in_channels=128, out_channels=256)
         self.conv_block4 = ConvBlock(in_channels=256, out_channels=512)
@@ -27,8 +26,8 @@ class CRNN10(nn.Module):
             num_layers=1, batch_first=True, bidirectional=True)
 
         self.event_fc = nn.Linear(512, class_num, bias=True)
-        self.azimuth_fc = nn.Linear(512, class_num, bias=True)
-        self.elevation_fc = nn.Linear(512, class_num, bias=True)
+        # self.azimuth_fc = nn.Linear(512, class_num, bias=True)
+        # self.elevation_fc = nn.Linear(512, class_num, bias=True)
 
         self.init_weights()
 
@@ -36,8 +35,8 @@ class CRNN10(nn.Module):
 
         init_gru(self.gru)
         init_layer(self.event_fc)
-        init_layer(self.azimuth_fc)
-        init_layer(self.elevation_fc)
+        # init_layer(self.azimuth_fc)
+        # init_layer(self.elevation_fc)
 
     def forward(self, x):
         '''input: (batch_size, mic_channels, time_steps, mel_bins)'''
@@ -60,18 +59,18 @@ class CRNN10(nn.Module):
         (x, _) = self.gru(x)
         
         event_output = torch.sigmoid(self.event_fc(x))
-        azimuth_output = self.azimuth_fc(x)
-        elevation_output = self.elevation_fc(x)     
+        # azimuth_output = self.azimuth_fc(x)
+        # elevation_output = self.elevation_fc(x)
         '''(batch_size, time_steps, class_num)'''
 
         # Interpolate
         event_output = interpolate(event_output, self.interp_ratio)
-        azimuth_output = interpolate(azimuth_output, self.interp_ratio) 
-        elevation_output = interpolate(elevation_output, self.interp_ratio)
+        # azimuth_output = interpolate(azimuth_output, self.interp_ratio)
+        # elevation_output = interpolate(elevation_output, self.interp_ratio)
         
         output = {
             'events': event_output,
-            'doas': torch.cat((azimuth_output, elevation_output), dim=-1)
+            # 'doas': torch.cat((azimuth_output, elevation_output), dim=-1)
         }
 
         return output
