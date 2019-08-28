@@ -263,7 +263,7 @@ def inference(args, data_generator, logging):
                                   'iter_{}.pth'.format(args.iteration))
         assert os.path.exists(model_path), 'Error: no checkpoint file found!'
         model = models.__dict__[args.model](class_num, args.model_pool_type,
-                                            args.model_pool_size, args.model_interp_ratio, pretrained_path)
+                                            args.model_pool_size)
         checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
         model.load_state_dict(checkpoint['model_state_dict'])
         if args.cuda:
@@ -360,7 +360,7 @@ if __name__ == '__main__':
     parser_train = subparsers.add_parser('train')
     # parser_train.add_argument('--workspace', type=str, required=True,
     # help='workspace directory')
-    parser_train.add_argument('--feature_dir', type=str, required=True,
+    parser_train.add_argument('--feature_dir', type=str, default='features',
                               help='feature directory')
     parser_train.add_argument('--feature_type', type=str, default='logmel',
                               choices=['logmel', 'logmelgcc'])
@@ -415,17 +415,10 @@ if __name__ == '__main__':
     args.lr = lr
     args.weight_decay = weight_decay
     args.hdf5 = hdf5_folder_name
-
-    if args.task_type == 'sed_only' or args.task_type == 'seld':
-        args.model = Model_SED
-    elif args.task_type == 'doa_only' or args.task_type == 'two_staged_eval':
-        args.model_pool_type = model_pool_type
+    args.model = Model_SED
     args.model_pool_size = model_pool_size
-    args.model_interp_ratio = model_interp_ratio
-    args.loss_type = loss_type
 
-    class_num = len(event_labels)
-    doa_num = len(doa_labels)
+    class_num = len(label_to_id_map)
 
     # inference all folds, otherwise train or inference single fold
     if args.mode == 'inference_all':
@@ -441,15 +434,17 @@ if __name__ == '__main__':
     cudnn.deterministic = True
 
     # logs directory
-    logs_dir = os.path.join(args.workspace, 'logs', args.task_type, args.mode,
+    '''
+    logs_dir = os.path.join('logs', args.mode,
                             'model_' + args.model + '_{}'.format(args.audio_type) + '_fold_{}'.format(args.fold) +
                             '_seed_{}'.format(args.seed))
     create_logging(logs_dir, filemode='w')
     logging.info(args)
+    '''
 
     # appendixes directory
     global appendixes_dir
-    appendixes_dir = os.path.join(args.workspace, 'appendixes')
+    appendixes_dir = os.path.join('appendixes')
     os.makedirs(appendixes_dir, exist_ok=True)
 
     # submissions directory
@@ -458,10 +453,6 @@ if __name__ == '__main__':
     os.makedirs(submissions_dir, exist_ok=True)
 
     # pretrained path
-    global pretrained_path
-    pretrained_path = os.path.join(appendixes_dir, 'models_saved', 'sed_only',
-                                   'model_' + Model_SED + '_{}'.format(args.audio_type) + '_fold_{}'.format(args.fold) +
-                                   '_seed_{}'.format(args.seed), 'iter_50000.pth')
 
     '''
     2. Model
@@ -469,8 +460,8 @@ if __name__ == '__main__':
     global models_dir
     if args.mode == 'train':
         # models directory
-        models_dir = os.path.join(appendixes_dir, 'models_saved', '{}'.format(args.task_type),
-                                  'model_' + args.model + '_{}'.format(args.audio_type) + '_fold_{}'.format(args.fold) +
+        models_dir = os.path.join(appendixes_dir, 'models_saved',
+                                  'model_' + args.model + '_fold_{}'.format(args.fold) +
                                   '_seed_{}'.format(args.seed))
         os.makedirs(models_dir, exist_ok=True)
     elif args.mode == 'inference':
@@ -479,7 +470,7 @@ if __name__ == '__main__':
 
     logging.info('\n===> Building model')
     model = models.__dict__[args.model](class_num, args.model_pool_type,
-                                        args.model_pool_size, args.model_interp_ratio, pretrained_path)
+                                        args.model_pool_size)
     optimizer = optim.Adam(model.parameters(), lr=lr,
                            betas=(0.9, 0.999), eps=1e-08,
                            weight_decay=weight_decay, amsgrad=True)
@@ -507,13 +498,15 @@ if __name__ == '__main__':
     '''
     3. Data generator
     '''
-    hdf5_dir = os.path.join(args.feature_dir, args.feature_type,
-                            hdf5_folder_name, args.audio_type)
-    data_generator = DataGenerator(
-        args=args,
-        hdf5_dir=hdf5_dir,
-        logging=logging
-    )
+    features_path = os.path.join(args.feature_dir, args.feature_type,
+                            hdf5_folder_name)
+    train_weak_data = read_dataset(features_path+"/train/weak", "metadata/train/weak.csv")
+
+    train_unlabel_in_domain_data = read_dataset(features_path+"/train/unlabel_in_domain", "metadata/train/unlabel_in_domain.csv")
+
+    validation_data = read_dataset(features_path+"/validation", "metadata/test/test.csv")
+
+    eval_data = read_dataset(features_path+"/eval", "metadata/eval/eval.csv")
 
     '''
     4. Train, test and evaluation

@@ -9,7 +9,7 @@ from models.model_utilities import ConvBlock, init_gru, init_layer, interpolate
 
 
 class CRNN3(nn.Module):
-    def __init__(self, class_num, pool_type='avg', pool_size=(1,4), pretrained_path=None):
+    def __init__(self, class_num, pool_type='avg', pool_size=(1,4)):
         
         super().__init__()
 
