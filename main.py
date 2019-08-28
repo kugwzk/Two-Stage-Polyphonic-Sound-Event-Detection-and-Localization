@@ -505,7 +505,7 @@ if __name__ == '__main__':
                             hdf5_folder_name)
     train_weak_data = read_dataset(features_path+"/train/weak", "metadata/train/weak.csv")
 
-    train_unlabel_in_domain_data = read_dataset(features_path+"/train/unlabel_in_domain", "metadata/train/unlabel_in_domain.csv")
+    # train_unlabel_in_domain_data = read_dataset(features_path+"/train/unlabel_in_domain", "metadata/train/unlabel_in_domain.csv")
 
     validation_data = read_dataset(features_path+"/validation", "metadata/test/test.csv")
 
