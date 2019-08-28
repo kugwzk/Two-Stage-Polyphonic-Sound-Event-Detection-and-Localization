@@ -79,7 +79,7 @@ class CRNN3(nn.Module):
         return output
 
 
-class pretrained_CRNN10(CRNN10):
+class pretrained_CRNN10(CRNN3):
 
     def __init__(self, class_num, pool_type='avg', pool_size=(2,2), interp_ratio=16, pretrained_path=None):
 

@@ -507,7 +507,7 @@ if __name__ == '__main__':
     validation_data = read_dataset(features_path+"/validation", "metadata/test/test.csv")
 
     eval_data = read_dataset(features_path+"/eval", "metadata/eval/eval.csv")
-
+    print()
     '''
     4. Train, test and evaluation
     '''
