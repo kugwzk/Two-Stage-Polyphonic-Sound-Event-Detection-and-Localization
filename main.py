@@ -21,7 +21,7 @@ from tqdm import tqdm
 import evaluation
 import models
 from loss import hybrid_regr_loss
-from torchsummary import summary
+# from torchsummary import summary
 from utils.data_generator import DataGenerator
 from utils.utilities import (create_logging, doa_labels, event_labels,
                              get_filename, logging_and_writer,
